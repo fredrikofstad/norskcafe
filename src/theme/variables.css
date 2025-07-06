@@ -1,0 +1,53 @@
+:root {
+    /* Coffee brown */
+    --ion-color-coffee: #9c7e65;
+    --ion-color-coffee-rgb: 111, 78, 55;
+    --ion-color-coffee-contrast: #ffffff;
+    --ion-color-coffee-contrast-rgb: 255, 255, 255;
+    --ion-color-coffee-shade: #5e4230;
+    --ion-color-coffee-tint: #7f5a45;
+
+    /* Cream background */
+    --ion-color-cream: #fdf6ee;
+    --ion-color-cream-rgb: 253, 246, 238;
+    --ion-color-cream-contrast: #111111;
+    --ion-color-cream-contrast-rgb: 17, 17, 17;
+    --ion-color-cream-shade: #e0d8d0;
+    --ion-color-cream-tint: #fefaf5;
+
+    /* Accent deep red */
+    --ion-color-accent: #a23e48;
+    --ion-color-accent-rgb: 162, 62, 72;
+    --ion-color-accent-contrast: #ffffff;
+    --ion-color-accent-contrast-rgb: 255, 255, 255;
+    --ion-color-accent-shade: #8c373f;
+    --ion-color-accent-tint: #b2525d;
+}
+
+/* Register these as Ionic colors */
+.ion-color-coffee {
+    --ion-color-base: var(--ion-color-coffee);
+    --ion-color-base-rgb: var(--ion-color-coffee-rgb);
+    --ion-color-contrast: var(--ion-color-coffee-contrast);
+    --ion-color-contrast-rgb: var(--ion-color-coffee-contrast-rgb);
+    --ion-color-shade: var(--ion-color-coffee-shade);
+    --ion-color-tint: var(--ion-color-coffee-tint);
+}
+
+.ion-color-cream {
+    --ion-color-base: var(--ion-color-cream);
+    --ion-color-base-rgb: var(--ion-color-cream-rgb);
+    --ion-color-contrast: var(--ion-color-cream-contrast);
+    --ion-color-contrast-rgb: var(--ion-color-cream-contrast-rgb);
+    --ion-color-shade: var(--ion-color-cream-shade);
+    --ion-color-tint: var(--ion-color-cream-tint);
+}
+
+.ion-color-accent {
+    --ion-color-base: var(--ion-color-accent);
+    --ion-color-base-rgb: var(--ion-color-accent-rgb);
+    --ion-color-contrast: var(--ion-color-accent-contrast);
+    --ion-color-contrast-rgb: var(--ion-color-accent-contrast-rgb);
+    --ion-color-shade: var(--ion-color-accent-shade);
+    --ion-color-tint: var(--ion-color-accent-tint);
+}

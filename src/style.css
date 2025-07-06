@@ -1,79 +1,80 @@
-:root {
-  font-family: system-ui, Avenir, Helvetica, Arial, sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* style.css */
 
-  color-scheme: light dark;
-  color: rgba(255, 255, 255, 0.87);
-  background-color: #242424;
-
-  font-synthesis: none;
-  text-rendering: optimizeLegibility;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
+/* Ensure HTML, body, and the root Vue app element take full height */
+/* This is crucial for Ionic's layout to correctly size ion-page and ion-content */
+html, body, #app {
+    height: 100%;
+    margin: 0;
+    padding: 0;
+    overflow: hidden; /* Prevents unwanted scrollbars on the main page */
+    font-family: "Inter", sans-serif; /* Use Inter font as per guidelines */
+    background-color: var(--ion-color-cream);
 }
 
-a {
-  font-weight: 500;
-  color: #646cff;
-  text-decoration: inherit;
-}
-a:hover {
-  color: #535bf2;
-}
-
-body {
-  margin: 0;
-  display: flex;
-  place-items: center;
-  min-width: 320px;
-  min-height: 100vh;
+/* Ensure ion-app and ion-page also take full height and use flex column layout */
+/* Ionic typically handles this, but explicit declaration can prevent overrides */
+ion-app, ion-page {
+    height: 100%;
+    width: 100%;
+    display: flex;
+    flex-direction: column;
 }
 
-h1 {
-  font-size: 3.2em;
-  line-height: 1.1;
+/* Basic styling for ion-content to ensure visibility and padding */
+ion-content {
+
+    flex-grow: 1; /* Allows ion-content to take up all available space in the flex column */
+    /* Add some default padding inside ion-content */
+    --padding-top: 16px;
+    --padding-bottom: 16px;
+    --padding-start: 16px;
+    --padding-end: 16px;
 }
 
-button {
-  border-radius: 8px;
-  border: 1px solid transparent;
-  padding: 0.6em 1.2em;
-  font-size: 1em;
-  font-weight: 500;
-  font-family: inherit;
-  background-color: #1a1a1a;
-  cursor: pointer;
-  transition: border-color 0.25s;
-}
-button:hover {
-  border-color: #646cff;
-}
-button:focus,
-button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+/* Optional: Basic styling for paragraphs inside ion-content */
+ion-content p {
+    margin-bottom: 10px;
+    line-height: 1.5;
 }
 
-.card {
-  padding: 2em;
+
+
+ion-content {
+    border-radius: 8px; /* Apply rounded corners */
 }
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  text-align: center;
+/* Adjustments for ion-toolbar to ensure it looks good with rounded corners */
+ion-toolbar {
+    --border-radius: 8px; /* Specific Ionic variable for toolbar border-radius */
+    --padding-start: 16px;
+    --padding-end: 16px;
 }
 
-@media (prefers-color-scheme: light) {
-  :root {
-    color: #213547;
-    background-color: #ffffff;
-  }
-  a:hover {
-    color: #747bff;
-  }
-  button {
-    background-color: #f9f9f9;
-  }
+
+
+@media (min-width: 768px) {
+    .header-content {
+        padding-left: 64px;
+        padding-right: 64px;
+    }
+}
+
+@media (min-width: 768px) {
+    .footer-start {
+        padding-left: 64px;
+    }
+    .footer-end {
+        padding-right: 64px;
+    }
+}
+
+.header-title {
+    text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+}
+
+/* Basic button styling (example, you might use Ionic's own button styles) */
+ion-button {
+    --border-radius: 8px;
+    --padding-start: 16px;
+    --padding-end: 16px;
 }
