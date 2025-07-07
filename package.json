@@ -5,7 +5,7 @@
   "homepage": "norsk.cafe",
   "type": "module",
   "scripts": {
-    "predeploy": "ionic build --prod",
+    "predeploy": "npm run build",
     "deploy": "gh-pages -d dist",
     "dev": "vite",
     "build": "vite build",
@@ -13,8 +13,6 @@
     "preview": "vite preview"
   },
   "dependencies": {
-    "@ionic/vue": "^8.6.3",
-    "@ionic/vue-router": "^8.6.3",
     "firebase": "^11.10.0",
     "vue": "^3.5.17",
     "vue-router": "^4.5.1"

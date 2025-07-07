@@ -1,80 +1,60 @@
 /* style.css */
 
-/* Ensure HTML, body, and the root Vue app element take full height */
-/* This is crucial for Ionic's layout to correctly size ion-page and ion-content */
+/* Make sure the app fills the viewport */
 html, body, #app {
     height: 100%;
     margin: 0;
     padding: 0;
-    overflow: hidden; /* Prevents unwanted scrollbars on the main page */
-    font-family: "Inter", sans-serif; /* Use Inter font as per guidelines */
-    background-color: var(--ion-color-cream);
+    font-family: "Inter", sans-serif;
+    background-color: #fdf6ee; /* cream color */
 }
 
-/* Ensure ion-app and ion-page also take full height and use flex column layout */
-/* Ionic typically handles this, but explicit declaration can prevent overrides */
-ion-app, ion-page {
-    height: 100%;
-    width: 100%;
-    display: flex;
-    flex-direction: column;
+/* Header reusable styles */
+header {
+    background-color: #9c7e65; /* coffee color */
+    color: #fff;
 }
 
-/* Basic styling for ion-content to ensure visibility and padding */
-ion-content {
-
-    flex-grow: 1; /* Allows ion-content to take up all available space in the flex column */
-    /* Add some default padding inside ion-content */
-    --padding-top: 16px;
-    --padding-bottom: 16px;
-    --padding-start: 16px;
-    --padding-end: 16px;
-}
-
-/* Optional: Basic styling for paragraphs inside ion-content */
-ion-content p {
-    margin-bottom: 10px;
-    line-height: 1.5;
-}
-
-
-
-ion-content {
-    border-radius: 8px; /* Apply rounded corners */
-}
-
-/* Adjustments for ion-toolbar to ensure it looks good with rounded corners */
-ion-toolbar {
-    --border-radius: 8px; /* Specific Ionic variable for toolbar border-radius */
-    --padding-start: 16px;
-    --padding-end: 16px;
-}
-
-
-
-@media (min-width: 768px) {
-    .header-content {
-        padding-left: 64px;
-        padding-right: 64px;
-    }
-}
-
-@media (min-width: 768px) {
-    .footer-start {
-        padding-left: 64px;
-    }
-    .footer-end {
-        padding-right: 64px;
-    }
-}
-
+/* Generic toolbar style if you reuse it */
 .header-title {
     text-shadow: 0 1px 2px rgba(0, 0, 0, 0.4);
+    margin: 0;
 }
 
-/* Basic button styling (example, you might use Ionic's own button styles) */
-ion-button {
-    --border-radius: 8px;
-    --padding-start: 16px;
-    --padding-end: 16px;
+/* Buttons */
+button {
+    border-radius: 8px;
+    padding: 0.5rem 1rem;
+    cursor: pointer;
+    font-family: inherit;
+}
+
+/* Accent button variation */
+button.accent {
+    background-color: #a23e48;
+    color: white;
+    border: none;
+}
+
+button.accent:hover {
+    background-color: #8c373f;
+}
+
+/* Footer */
+footer {
+    background-color: #9c7e65; /* coffee color */
+    color: #fff;
+    padding: 0.75rem 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+/* Responsive header/footer paddings for large screens */
+@media (min-width: 768px) {
+    .footer-start,
+    .footer-end {
+        padding-left: 64px;
+        padding-right: 64px;
+    }
 }
