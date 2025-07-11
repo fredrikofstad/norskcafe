@@ -1,0 +1,71 @@
+{
+  "no": {
+    "title": "Personvernerklæring",
+    "updated": "Sist oppdatert: 6. juli 2025",
+    "who": {
+      "title": "Hvem er vi",
+      "text": "Norsk Cafe er utviklet og driftet av Fredrik Ofstad, som er behandlingsansvarlig for dine personopplysninger."
+    },
+    "what": {
+      "title": "Hvilke data samles inn?",
+      "text": "Når du logger inn med Google, mottar vi følgende informasjon:",
+      "items": ["Navn", "E-postadresse", "Profilbilde"],
+      "note": "Denne informasjonen brukes kun til å tilpasse din opplevelse i appen. Vi lagrer ikke passord."
+    },
+    "where": {
+      "title": "Hvor lagres dataene?",
+      "text": "Dataene lagres i Google Firebase Authentication og Firestore-databasen. Selve appen hostes på GitHub Pages."
+    },
+    "cookies": {
+      "title": "Informasjonskapsler og sporing",
+      "text": "Norsk Cafe bruker for øyeblikket ikke informasjonskapsler eller analyseverktøy. Google Analytics kan vurderes senere, men vil i så fall kreve samtykke."
+    },
+    "sharing": {
+      "title": "Deling av data",
+      "text": "Vi deler ikke dine personopplysninger med tredjeparter, med unntak av bruk av Google Firebase som databehandler."
+    },
+    "rights": {
+      "title": "Dine rettigheter",
+      "items": ["Innsyn i egne personopplysninger", "Sletting av data", "Klage til Datatilsynet"]
+    },
+    "deletion": {
+      "title": "Slette konto",
+      "text": "Du kan slette kontoen din direkte i appen. Dette sletter brukeren og tilhørende data fra Firebase."
+    }
+
+  },
+  "en": {
+    "title": "Privacy Policy",
+    "updated": "Last updated: 6 July 2025",
+    "who": {
+      "title": "Who we are",
+      "text": "Norsk Cafe is developed and operated by Fredrik Ofstad, who is the data controller responsible for your personal information."
+    },
+    "what": {
+      "title": "What data do we collect?",
+      "text": "When you sign in with Google, we receive:",
+      "items": ["Your name", "Your email address", "Your profile picture"],
+      "note": "This is used only to personalize your experience. We do not collect or store any passwords."
+    },
+    "where": {
+      "title": "Where is the data stored?",
+      "text": "Your data is stored in Google Firebase Authentication and Firestore. The app is hosted on GitHub Pages."
+    },
+    "cookies": {
+      "title": "Cookies and tracking",
+      "text": "Norsk Cafe does not currently use cookies or tracking tools. Google Analytics may be added in the future, but only with explicit consent."
+    },
+    "sharing": {
+      "title": "Data sharing",
+      "text": "We do not share your data with third parties, except for Google Firebase, which acts as a data processor."
+    },
+    "rights": {
+      "title": "Your rights",
+      "items": ["Access your personal data", "Request deletion", "File a complaint with your data protection authority"]
+    },
+    "deletion": {
+      "title": "Account deletion",
+      "text": "You can delete your account from the settings page. This will remove your user and data from Firebase."
+    }
+  }
+}

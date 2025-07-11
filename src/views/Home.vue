@@ -1,26 +1,24 @@
 <script setup>
 import { useRouter } from 'vue-router'
 import { auth } from '../firebase'
-import { onMounted } from 'vue'
-
 const router = useRouter()
 
-onMounted(() => {
-  const user = auth.currentUser
-  if (user) {
-    router.push('/dashboard')
-  }
-})
-
 function goToLogin() {
-  router.push('/login')
+  const currentUser = auth.currentUser;
+  if (currentUser) {
+    router.push('/dashboard');
+  } else {
+    router.push('/login');
+  }
 }
+
 </script>
 
 <template>
   <div class="home-page">
 
     <main class="welcome">
+      <div class="welcome"></div>
       <h1>Velkommen!</h1>
       <p>Her på Norsk Cafe skal vi lære norsk på en morsom og effektiv måte!</p>
       <button class="start-button" @click="goToLogin">
@@ -34,7 +32,6 @@ function goToLogin() {
 .home-page {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-cream);
 }
 
 .welcome {
@@ -44,7 +41,8 @@ function goToLogin() {
 }
 
 .welcome h1 {
-  font-size: 2rem;
+  font-size: 5rem;
+  font-family: 'Caveat', cursive;
 }
 
 .welcome p {

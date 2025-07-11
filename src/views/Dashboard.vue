@@ -2,18 +2,21 @@
 import { ref, onMounted } from 'vue'
 import { useRouter } from 'vue-router'
 import { auth } from '../firebase'
+import { onAuthStateChanged } from 'firebase/auth'
 
 const router = useRouter()
 const userName = ref('')
 
 // check for user
 onMounted(() => {
-  const user = auth.currentUser
-  if (user) {
-    userName.value = user.displayName || user.email || 'Bruker'
-  } else {
-    router.push('/login')
-  }
+  onAuthStateChanged(auth, (user) => {
+    if (user) {
+      const fullName = user.displayName || user.email || 'Bruker'
+      userName.value = fullName.split(' ')[0]  // take first name
+    } else {
+      router.push('/login')
+    }
+  })
 })
 
 function logout() {
@@ -26,16 +29,39 @@ function logout() {
   <div class="dashboard-page">
 
     <main class="dashboard-content">
-      <h2>Hei {{ userName }}!</h2>
-      <p>Velkommen til Norsk Cafe sin læringsplattform.</p>
 
-      <section class="courses-card">
-        <h3>Dine kurs</h3>
-        <ul class="courses-list">
-          <li>Grunnleggende norsk</li>
-          <li>Norsk samtalepraksis</li>
-        </ul>
-      </section>
+      <div class="dashboard-welcome">
+        <h2>Hei {{ userName }}!</h2>
+        <p>Velkommen til ditt dashboard. Ta en titt rundt!</p>
+      </div>
+
+      <div class="cards-container">
+        <div class="dashboard-card" @click="goToLearn">
+          <div class="card-text">
+            <h3>Lær</h3>
+            <p>Start en ny leksjon og lær nye ord.</p>
+          </div>
+          <img src="../assets/dashboard/read.png" alt="Lær" class="card-icon" />
+        </div>
+
+        <div class="dashboard-card" @click="goToReview">
+          <div class="card-text">
+            <h3>Repeter</h3>
+            <p>Gå gjennom ordene  du allerede kan.</p>
+          </div>
+          <img src="../assets/dashboard/review.png" alt="Repeter" class="card-icon" />
+        </div>
+
+        <div class="dashboard-card" @click="goToListen">
+          <div class="card-text">
+            <h3>Lytt</h3>
+            <p>kommer snart.</p>
+          </div>
+          <img src="../assets/dashboard/listen.png" alt="Lytt" class="card-icon" />
+        </div>
+
+      </div>
+
     </main>
   </div>
 </template>
@@ -44,43 +70,92 @@ function logout() {
 .dashboard-page {
   display: flex;
   flex-direction: column;
-  background-color: var(--color-cream);
+}
+
+.dashboard-welcome {
+  text-align: center;
+  margin-top: 2rem;
+}
+
+.dashboard-welcome h2 {
+  font-family: 'Caveat', cursive;
+  font-size: 2.3rem;
 }
 
 
-.dashboard-content {
-  flex: 1;
-  padding: 1rem;
+.cards-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-start;
+  justify-content: center;
 }
 
-.courses-card {
+
+
+.dashboard-card {
   background-color: white;
-  border-radius: 8px;
+  opacity: 0.95;
+  border-radius: 12px;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
   padding: 1rem;
-  box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+  width: 100%;
+  max-width: 390px;
+  flex: 1 1 300px;
+  cursor: pointer;
+  transition: transform 0.2s ease;
   margin-top: 1rem;
 }
 
-.courses-card h3 {
-  margin-top: 0;
+@media (max-width: 600px) {
+  .dashboard-card {
+    transform: scale(0.95);
+    padding: 0.8rem;
+    margin-top: 0rem;
+  }
+  .card-icon {
+    width: 50%;
+    height: auto;
+    aspect-ratio: 1 / 1;
+    object-fit: contain;
+    max-width: 256px;
+    min-width: 128px;
+  }
+
+  .card-text h3 {
+    font-size: 1.25rem;
+  }
+
+  .card-text p {
+    font-size: 0.9rem;
+  }
 }
 
-.courses-list {
-  list-style: none;
-  padding: 0;
-  margin: 0;
+.card-text {
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-start; /* push content toward the top */
+  height: 100%;
+  padding-left: 1rem;
 }
 
-.courses-list li {
-  padding: 0.5rem 0;
-  border-bottom: 1px solid #eee;
+.card-text h3 {
+  font-family: 'Caveat', cursive;
+  font-size: 3rem; /* adjust as needed */
+  margin-bottom: 0.5rem;
 }
 
-.courses-list li:last-child {
-  border-bottom: none;
+.dashboard-card:hover {
+  transform: scale(1.05);
 }
 
-h2 {
-  margin-top: 1rem;
+.card-icon {
+  width: 256px;
+  height: 256px;
+  margin-right: 1rem;
 }
+
 </style>

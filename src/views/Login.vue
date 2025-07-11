@@ -65,7 +65,6 @@ async function googleSignIn() {
 .login-page {
   display: flex;
   flex-direction: column;
-  background-color: #fdf6ee; /* cream */
 }
 
 .login-content {

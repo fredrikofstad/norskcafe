@@ -6,6 +6,7 @@ import githubLogo from '../assets/github-mark-white.svg'
   <footer class="footer">
     <div class="footer-start">
       <span class="copyright">© 2025 Fredrik Ofstad</span>
+      <router-link to="/privacy" class="privacy-link">Privacy Policy</router-link>
     </div>
     <div class="footer-end">
       <a
@@ -43,5 +44,16 @@ import githubLogo from '../assets/github-mark-white.svg'
   width: 30px;
   height: 30px;
   filter: brightness(0) invert(1);
+}
+
+.privacy-link {
+  margin-left: 1rem;
+  color: #ffffff;
+  text-decoration: underline;
+  font-size: 0.9rem;
+}
+
+.privacy-link:hover {
+  text-decoration: none;
 }
 </style>
