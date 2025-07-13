@@ -5,6 +5,7 @@ import Login from '../views/Login.vue'
 import Dashboard from "../views/Dashboard.vue";
 import Privacy from "../views/Privacy.vue";
 import Account from "../views/Account.vue";
+import Review from "../views/Review.vue";
 
 
 const routes = [
@@ -13,6 +14,7 @@ const routes = [
     { path: '/dashboard', component: Dashboard },
     { path: '/privacy', component: Privacy },
     { path: '/account', component: Account },
+    { path: '/review', component: Review },
 ]
 
 const router = createRouter({

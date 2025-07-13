@@ -19,6 +19,10 @@ onMounted(() => {
   })
 })
 
+function goToReview(){
+  router.push('/review')
+}
+
 function logout() {
   auth.signOut()
   router.push('/login')

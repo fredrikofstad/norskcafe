@@ -1,0 +1,104 @@
+[
+  {
+    "type": "noun",
+    "norwegian": "substantiv",
+    "english": "noun",
+    "gender": "et",
+    "plural": {
+      "indefinite": "substantiv",
+      "definite": "substantivene"
+    },
+    "level": "A1",
+    "pronunciation": "audio/substantiv.mp3",
+    "example": {
+      "no": "Substantiv er navn på ting.",
+      "en": "Nouns are names of things."
+    },
+    "id": "0n1"
+  },
+  {
+    "type": "noun",
+    "norwegian": "verb",
+    "english": "verb",
+    "gender": "et",
+    "plural": {
+      "indefinite": "verb",
+      "definite": "verbene"
+    },
+    "level": "A1",
+    "pronunciation": "audio/verb.mp3",
+    "example": {
+      "no": "Verb forteller hva noen gjør.",
+      "en": "Verbs describe what someone does."
+    },
+    "id": "0n2"
+  },
+  {
+    "type": "noun",
+    "norwegian": "adjektiv",
+    "english": "adjective",
+    "gender": "et",
+    "plural": {
+      "indefinite": "adjektiv",
+      "definite": "adjektivene"
+    },
+    "level": "A1",
+    "pronunciation": "audio/adjektiv.mp3",
+    "example": {
+      "no": "Adjektiv beskriver substantiv.",
+      "en": "Adjectives describe nouns."
+    },
+    "id": "0n3"
+  },
+  {
+    "type": "noun",
+    "norwegian": "adverb",
+    "english": "adverb",
+    "gender": "et",
+    "plural": {
+      "indefinite": "adverb",
+      "definite": "adverbene"
+    },
+    "level": "A1",
+    "pronunciation": "audio/adverb.mp3",
+    "example": {
+      "no": "Adverb beskriver verb, adjektiv eller andre adverb.",
+      "en": "Adverbs describe verbs, adjectives, or other adverbs."
+    },
+    "id": "0n4"
+  },
+  {
+    "type": "noun",
+    "norwegian": "pronomen",
+    "english": "pronoun",
+    "gender": "et",
+    "plural": {
+      "indefinite": "pronomen",
+      "definite": "pronomenene"
+    },
+    "level": "A1",
+    "pronunciation": "audio/pronomen.mp3",
+    "example": {
+      "no": "Pronomen brukes i stedet for substantiv.",
+      "en": "Pronouns are used instead of nouns."
+    },
+    "id": "0n5"
+  },
+  {
+    "type": "noun",
+    "norwegian": "preposisjon",
+    "english": "preposition",
+    "gender": "en",
+    "plural": {
+      "indefinite": "preposisjoner",
+      "definite": "preposisjonene"
+    },
+    "level": "A1",
+    "pronunciation": "audio/preposisjon.mp3",
+    "example": {
+      "no": "Preposisjoner viser forhold.",
+      "en": "Prepositions show relationships."
+    },
+    "id": "0n6"
+  }
+]
