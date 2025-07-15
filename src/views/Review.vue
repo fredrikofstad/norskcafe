@@ -3,8 +3,10 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import useReviewQueue from '../composables/useReviewQueue.ts'
 import grammarLesson from '../assets/lessons/lesson0.json'
 
+import arrowDown from '../assets/arrow-down.svg'
+
 const unlockedLessons = ref(['0'])
-const reviewIds = ref(['0n1', '0n2', '0n3', '0n4', '0n5'])
+const reviewIds = ref(['0n1', '0n2', '0n3', '0n4', '0n5', '0v1', '0a2'])
 
 // Load the randomized queue
 const reviewWords = useReviewQueue(grammarLesson, unlockedLessons.value, reviewIds.value)
@@ -17,15 +19,34 @@ const checked = ref(false)
 const isCorrect = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
 
+const isInputEmpty = computed(() => answer.value.trim() === '')
 const currentWord = computed(() => {
   return reviewWords.value?.[currentIndex.value] ?? null
 })
+
+const showDetails = ref(false)
+
+function toggleDetails() {
+  if (checked.value) {
+    showDetails.value = !showDetails.value
+  }
+}
+
+
+function capitalizeFirst(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
+
+function normalize(str: string): string {
+  return str.trim().toLowerCase().replace(/^(a|an)\s+/, '')
+}
 
 function checkAnswer() {
   const word = currentWord.value
   if (!word) return
 
-  const correct = answer.value.trim().toLowerCase() === word.answer.toLowerCase()
+  const correct = currentWord.value?.accept.includes(normalize(answer.value))
+
   isCorrect.value = correct
 
   if (correct) {
@@ -45,11 +66,21 @@ function checkAnswer() {
   })
 }
 
+function maybeToggleDetails(e: KeyboardEvent) {
+  // Don’t toggle if input is focused
+  if (document.activeElement === inputRef.value) return
+  if (checked.value) {
+    toggleDetails()
+  }
+}
+
+
 function nextCard() {
   showFeedback.value = false
   answer.value = ''
   checked.value = false
   isCorrect.value = false
+  showDetails.value = false // ← reset details toggle
 
   if (currentIndex.value < reviewWords.value.length - 1) {
     currentIndex.value++
@@ -61,6 +92,7 @@ function nextCard() {
   nextTick(() => inputRef.value?.focus())
 }
 
+
 watch(currentIndex, () => {
   nextTick(() => inputRef.value?.focus())
 })
@@ -71,10 +103,19 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="review-session" @keyup.enter.prevent="checked ? nextCard() : checkAnswer()" tabindex="0">
-    <h2>Gjennomgang</h2>
-    <div v-if="reviewWords.length && currentWord">
-      <p><strong>Oversett:</strong> {{ currentWord.prompt }}</p>
+  <div
+      class="review-session"
+      @keyup.enter.prevent="(!isInputEmpty && !checked) ? checkAnswer() : (checked ? nextCard() : null)"
+      @keydown.space.prevent="maybeToggleDetails"
+      tabindex="0"
+  >
+    <div v-if="reviewWords.length && currentWord" class="card">
+      <div class="word-display">
+        <p class="big-word">{{ capitalizeFirst(currentWord.prompt) }}</p>
+        <p class="direction-hint">
+          {{ currentWord.direction === 'toEnglish' ? 'Oversett til engelsk' : 'Oversett til norsk' }}
+        </p>
+      </div>
 
       <div class="input-group">
         <input
@@ -84,19 +125,75 @@ onMounted(() => {
             :disabled="checked"
             placeholder="Ditt svar"
         />
-        <button @click="checked ? nextCard() : checkAnswer()">
+        <button @click="checked ? nextCard() : checkAnswer()" :disabled="isInputEmpty && !checked" class="check-button">
           {{ checked ? 'Neste' : 'Sjekk' }}
         </button>
       </div>
 
-      <transition name="fade">
-        <div v-if="showFeedback" class="feedback">
-          <p>{{ feedbackMessage }}</p>
+      <div class="feedback-wrapper">
+          <div
+              v-if="showFeedback"
+              class="feedback visible"
+          >
+            <p>{{ feedbackMessage }}</p>
+          </div>
+        <div v-else class="feedback hidden">
+          <p>&nbsp;</p>
         </div>
-      </transition>
+      </div>
     </div>
+
+    <button
+        class="details-toggle"
+        :class="{ disabled: !checked }"
+        @click="toggleDetails"
+    >
+      <img :src="arrowDown" alt="Vis mer" />
+    </button>
+
+    <div v-if="showDetails" class="word-details">
+      <div class="word-meta">
+        <h4>Ordinfo:</h4>
+        <p><strong>Norsk:</strong> {{ currentWord.word.gender }} {{ currentWord.word.norwegian }}</p>
+        <p><strong>Engelsk: </strong>
+          <template v-if="currentWord.word.type === 'noun'">
+            {{ currentWord.word.article }} {{ currentWord.word.english }}
+          </template>
+          <template v-else>
+            {{ currentWord.word.english }}
+          </template>
+        </p>
+
+      </div>
+
+
+      <div v-if="currentWord.word.example?.length">
+        <h4>Eksempel setninger:</h4>
+        <ul>
+          <li v-for="(ex, idx) in currentWord.word.example" :key="idx">{{ ex }}</li>
+        </ul>
+      </div>
+
+      <div v-if="currentWord.word.type === 'verb' && currentWord.word.conjugation">
+        <h4>Bøying:</h4>
+        <p>Nåtid: {{ currentWord.word.conjugation.present }}</p>
+        <p>Fortid: {{ currentWord.word.conjugation.past }}</p>
+        <p>Perfektum: {{ currentWord.word.conjugation.perfect }}</p>
+      </div>
+
+      <div v-if="currentWord.word.type === 'adjective' && currentWord.word.comparison">
+        <h4>Gradbøying:</h4>
+        <p>Positiv: {{ currentWord.word.comparison.positive }}</p>
+        <p>Komparativ: {{ currentWord.word.comparison.comparative }}</p>
+        <p>Superlativ: {{ currentWord.word.comparison.superlative }}</p>
+      </div>
+    </div>
+
+
+
   </div>
 </template>
+
 
 <style scoped>
 .review-session {
@@ -106,6 +203,10 @@ onMounted(() => {
   background: white;
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+}
+.review-session:focus {
+  outline: none;
+  border: none;
 }
 
 .input-group {
@@ -134,7 +235,7 @@ input.incorrect {
   border-color: #dc3545;
 }
 
-button {
+button.check-button {
   padding: 1rem;
   font-size: 1.2rem;
   background-color: var(--color-accent);
@@ -145,22 +246,78 @@ button {
   transition: background-color 0.3s ease;
 }
 
-button:hover {
+button.check-button:hover {
   background-color: var(--color-accent-hover);
 }
 
+
 .feedback {
+  text-align: center;
   margin-top: 1rem;
   font-size: 1.1rem;
-  transition: opacity 0.4s ease;
 }
 
-.fade-enter-active,
-.fade-leave-active {
-  transition: opacity 0.4s ease;
+.word-display {
+  text-align: center;
+  margin-bottom: 1rem;
 }
-.fade-enter-from,
-.fade-leave-to {
-  opacity: 0;
+
+.big-word {
+  font-size: 3rem;
+  font-weight: bold;
 }
+
+.direction-hint {
+  font-size: 1rem;
+  color: #777;
+  margin-top: 0.25rem;
+}
+
+.feedback-wrapper {
+  min-height: 2rem; /* juster etter ønsket høyde */
+  margin-top: 1rem;
+}
+
+.feedback.hidden {
+  visibility: hidden;
+}
+
+.feedback.visible {
+  visibility: visible;
+}
+
+.details-toggle {
+  display: block;
+  margin: 2rem auto 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  opacity: 1;
+  transition: opacity 0.3s ease;
+}
+
+.details-toggle.disabled {
+  opacity: 0.3;
+  pointer-events: none;
+}
+
+.details-toggle img {
+  width: 32px;
+  height: 32px;
+}
+
+.details-toggle:hover img {
+  filter: brightness(1.2);
+}
+
+
+.word-details {
+  margin-top: 1.5rem;
+  font-size: 1.05rem;
+  background: #f9f9f9;
+  padding: 1rem;
+  border-radius: 8px;
+}
+
+
 </style>

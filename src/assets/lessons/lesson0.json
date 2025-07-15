@@ -1,104 +1,257 @@
 [
   {
+    "id": "0n1",
     "type": "noun",
     "norwegian": "substantiv",
     "english": "noun",
     "gender": "et",
+    "article": "a",
     "plural": {
       "indefinite": "substantiv",
       "definite": "substantivene"
     },
     "level": "A1",
-    "pronunciation": "audio/substantiv.mp3",
-    "example": {
-      "no": "Substantiv er navn på ting.",
-      "en": "Nouns are names of things."
-    },
-    "id": "0n1"
+    "example": [
+      "Substantiv er navn på ting."
+    ]
   },
   {
+    "id": "0n2",
     "type": "noun",
     "norwegian": "verb",
     "english": "verb",
     "gender": "et",
+    "article": "a",
     "plural": {
       "indefinite": "verb",
       "definite": "verbene"
     },
     "level": "A1",
-    "pronunciation": "audio/verb.mp3",
-    "example": {
-      "no": "Verb forteller hva noen gjør.",
-      "en": "Verbs describe what someone does."
-    },
-    "id": "0n2"
+    "example": [
+      "Verb forteller hva noen gjør."
+    ]
   },
   {
+    "id": "0n3",
     "type": "noun",
     "norwegian": "adjektiv",
     "english": "adjective",
     "gender": "et",
+    "article": "an",
     "plural": {
       "indefinite": "adjektiv",
       "definite": "adjektivene"
     },
     "level": "A1",
-    "pronunciation": "audio/adjektiv.mp3",
-    "example": {
-      "no": "Adjektiv beskriver substantiv.",
-      "en": "Adjectives describe nouns."
-    },
-    "id": "0n3"
+    "example": [
+      "Adjektiv beskriver substantiv."
+    ]
   },
   {
+    "id": "0n4",
     "type": "noun",
     "norwegian": "adverb",
     "english": "adverb",
     "gender": "et",
+    "article": "an",
     "plural": {
       "indefinite": "adverb",
       "definite": "adverbene"
     },
     "level": "A1",
-    "pronunciation": "audio/adverb.mp3",
-    "example": {
-      "no": "Adverb beskriver verb, adjektiv eller andre adverb.",
-      "en": "Adverbs describe verbs, adjectives, or other adverbs."
-    },
-    "id": "0n4"
+    "example": [
+      "Adverb beskriver verb, adjektiv eller andre adverb."
+    ]
   },
   {
+    "id": "0n5",
     "type": "noun",
     "norwegian": "pronomen",
     "english": "pronoun",
     "gender": "et",
+    "article": "a",
     "plural": {
       "indefinite": "pronomen",
       "definite": "pronomenene"
     },
     "level": "A1",
-    "pronunciation": "audio/pronomen.mp3",
-    "example": {
-      "no": "Pronomen brukes i stedet for substantiv.",
-      "en": "Pronouns are used instead of nouns."
-    },
-    "id": "0n5"
+    "example": [
+      "Pronomen brukes i stedet for substantiv."
+    ]
   },
   {
+    "id": "0n6",
     "type": "noun",
     "norwegian": "preposisjon",
     "english": "preposition",
     "gender": "en",
+    "article": "a",
     "plural": {
       "indefinite": "preposisjoner",
       "definite": "preposisjonene"
     },
     "level": "A1",
-    "pronunciation": "audio/preposisjon.mp3",
-    "example": {
-      "no": "Preposisjoner viser forhold.",
-      "en": "Prepositions show relationships."
+    "example": [
+      "Preposisjoner viser forhold."
+    ]
+  },
+  {
+    "id": "0v1",
+    "type": "verb",
+    "norwegian": "å forklare",
+    "english": "to explain",
+    "level": "A1",
+    "conjugation": {
+      "present": "forklarer",
+      "past": "forklarte",
+      "perfect": "har forklart"
     },
-    "id": "0n6"
+    "example": [
+      "Kan du forklare regelen en gang til?",
+      "Læreren forklarer hva ordet betyr."
+    ]
+  },
+  {
+    "id": "0v2",
+    "type": "verb",
+    "norwegian": "å stave",
+    "english": "to spell",
+    "level": "A1",
+    "conjugation": {
+      "present": "staver",
+      "past": "stavet",
+      "perfect": "har stavet"
+    },
+    "example": [
+      "Hvordan staver du navnet ditt?"
+    ]
+  },
+  {
+    "id": "0v3",
+    "type": "verb",
+    "norwegian": "å bøye",
+    "english": "to conjugate",
+    "level": "A1",
+    "conjugation": {
+      "present": "bøyer",
+      "past": "bøyde",
+      "perfect": "har bøyd"
+    },
+    "example": [
+      "Du må bøye verbet riktig.",
+      "Vi lærer å bøye substantiv i flertall."
+    ]
+  },
+  {
+    "id": "0v4",
+    "type": "verb",
+    "norwegian": "å øve",
+    "english": "to practice",
+    "level": "A1",
+    "conjugation": {
+      "present": "øver",
+      "past": "øvde",
+      "perfect": "har øvd"
+    },
+    "example": [
+      "Jeg øver på å snakke norsk.",
+      "Du bør øve litt hver dag."
+    ]
+  },
+  {
+    "id": "0v5",
+    "type": "verb",
+    "norwegian": "å uttale",
+    "english": "to pronounce",
+    "level": "A1",
+    "conjugation": {
+      "present": "uttaler",
+      "past": "uttalte",
+      "perfect": "har uttalt"
+    },
+    "example": [
+      "Hvordan uttaler man dette ordet?",
+      "Han uttaler bokstavene tydelig."
+    ]
+  },
+  {
+    "id": "0a1",
+    "type": "adjective",
+    "norwegian": "bestemt",
+    "english": "definite",
+    "level": "A1",
+    "forms": {
+      "masculine_feminine": "bestemt",
+      "neuter": "bestemt",
+      "plural": "bestemte",
+      "definite": "bestemte"
+    },
+    "example": [
+      "Vi bruker bestemt form når vi kjenner til noe.",
+      "Substantivet står i bestemt form."
+    ]
+  },
+  {
+    "id": "0a2",
+    "type": "adjective",
+    "norwegian": "ubestemt",
+    "english": "indefinite",
+    "level": "A1",
+    "forms": {
+      "masculine_feminine": "ubestemt",
+      "neuter": "ubestemt",
+      "plural": "ubestemte",
+      "definite": "ubestemte"
+    },
+    "example": [
+      "Ubestemt form brukes når noe nevnes for første gang.",
+      "Et ubestemt substantiv har ikke bestemt artikkel."
+    ]
+  },
+  {
+    "id": "0a3",
+    "type": "adjective",
+    "norwegian": "sterk",
+    "english": "strong",
+    "level": "A1",
+    "forms": {
+      "masculine_feminine": "sterk",
+      "neuter": "sterkt",
+      "plural": "sterke",
+      "definite": "sterke"
+    },
+    "comparison": {
+      "positive": "sterk",
+      "comparative": "sterkere",
+      "superlative": "sterkest"
+    },
+    "example": [
+      "Noen verb er sterke og bøyes uregelmessig.",
+      "Han er en sterk student."
+    ]
+  },
+  {
+    "id": "0a4",
+    "type": "adjective",
+    "norwegian": "svak",
+    "english": "weak",
+    "level": "A1",
+    "forms": {
+      "masculine_feminine": "svak",
+      "neuter": "svakt",
+      "plural": "svake",
+      "definite": "svake"
+    },
+    "comparison": {
+      "positive": "svak",
+      "comparative": "svakere",
+      "superlative": "svakest"
+    },
+    "example": [
+      "De fleste norske verb er svake.",
+      "Det var et svakt argument."
+    ]
   }
+
+
 ]

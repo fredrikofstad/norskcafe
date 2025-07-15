@@ -45,7 +45,7 @@ function logout() {
 }
 
 function goHome() {
-  router.push('/')
+  router.push('/dashboard')
 }
 </script>
 

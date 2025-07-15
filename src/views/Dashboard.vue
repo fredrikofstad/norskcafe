@@ -118,7 +118,7 @@ function logout() {
   .dashboard-card {
     transform: scale(0.95);
     padding: 0.8rem;
-    margin-top: 0rem;
+    margin-top: 0;
   }
   .card-icon {
     width: 50%;
