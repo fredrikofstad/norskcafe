@@ -1,30 +1,65 @@
 <script setup lang="ts">
 import { ref, computed, onMounted, watch, nextTick } from 'vue'
-import useReviewQueue from '../composables/useReviewQueue.ts'
+import useReviewQueue from '../composables/useReviewQueue'
+import { useSrsUpload } from '../composables/useSrsUpload'
+import { useAnswerCheck } from '../composables/useAnswerCheck'
+import {ReviewItem, Word} from '../types/words'
+import {getDueEntries, updateSrsProgress} from '../firebase/firebaseSrs'
 import grammarLesson from '../assets/lessons/lesson0.json'
-
 import arrowDown from '../assets/arrow-down.svg'
+import {SrsSessionEntry} from "../types/srs";
 
-const unlockedLessons = ref(['0'])
-const reviewIds = ref(['0n1', '0n2', '0n3', '0n4', '0n5', '0v1', '0a2'])
+// Utility functions (inlined)
+function capitalizeFirst(str: string): string {
+  return str.charAt(0).toUpperCase() + str.slice(1)
+}
 
-// Load the randomized queue
-const reviewWords = useReviewQueue(grammarLesson, unlockedLessons.value, reviewIds.value)
+// Setup data
+
+const today = new Date()
+const dueEntries = getDueEntries(today)
+
+const sessionState = ref(
+    Object.fromEntries(
+        dueEntries.map(entry => [entry.wordId, entry])
+    )
+)
+const levelMessage = ref('')
+const showLevelAnimation = ref(false)
+
+const reviewWords = useReviewQueue(grammarLesson as Word[], dueEntries)
+const reviewedWords = ref<ReviewItem[]>([])
+
+// word levels
+const levelChange = ref<null | { wordId: string; delta: number }>(null)
+const showLevelFeedback = ref(false)
+
+
+useSrsUpload(() => reviewedWords.value)
 
 const currentIndex = ref(0)
 const answer = ref('')
-const showFeedback = ref(false)
-const feedbackMessage = ref('')
-const checked = ref(false)
-const isCorrect = ref(false)
 const inputRef = ref<HTMLInputElement | null>(null)
+const checked = ref(false)
 
 const isInputEmpty = computed(() => answer.value.trim() === '')
-const currentWord = computed(() => {
-  return reviewWords.value?.[currentIndex.value] ?? null
-})
-
+const currentWord = computed(() => reviewWords.value?.[currentIndex.value] ?? null)
 const showDetails = ref(false)
+
+const {
+  check: checkAnswer,
+  isCorrect,
+  feedbackMessage,
+  showFeedback
+} = useAnswerCheck(
+    reviewWords,
+    currentWord,
+    answer,
+    reviewedWords,
+    () => {
+      nextTick(() => (document.querySelector('.review-session') as HTMLElement)?.focus())
+    }
+)
 
 function toggleDetails() {
   if (checked.value) {
@@ -32,64 +67,50 @@ function toggleDetails() {
   }
 }
 
-
-function capitalizeFirst(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1)
+function maybeToggleDetails(e: KeyboardEvent) {
+  const target = e.target as HTMLElement
+  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
+  e.preventDefault()
+  if (checked.value) toggleDetails()
 }
 
-function normalize(str: string): string {
-  return str.trim().toLowerCase().replace(/^(a|an)\s+/, '')
-}
-
-function checkAnswer() {
+function nextCard() {
   const word = currentWord.value
   if (!word) return
 
-  const correct = currentWord.value?.accept.includes(normalize(answer.value))
+  const wordId = word.word.id
+  const direction = word.direction
+  const correct = !!word.correct
 
-  isCorrect.value = correct
+  updateSrsProgress(wordId, direction, correct, sessionState.value, (id, leveledUp) => {
+    levelMessage.value = leveledUp ? 'Level UP!' : 'Level Down'
+    showLevelAnimation.value = true
 
-  if (correct) {
-    feedbackMessage.value = '✅ Riktig!'
-  } else {
-    feedbackMessage.value = `❌ Feil. Riktig svar er "${word.answer}".`
-    // Re-insert incorrect word at end of queue
-    reviewWords.value.push({ ...word })
-  }
-
-  showFeedback.value = true
-  checked.value = true
-
-  nextTick(() => {
-    const wrapper = document.querySelector('.review-session') as HTMLElement
-    wrapper?.focus()
+    setTimeout(() => {
+      showLevelAnimation.value = false
+    }, 1500)
   })
-}
 
-function maybeToggleDetails(e: KeyboardEvent) {
-  // Don’t toggle if input is focused
-  if (document.activeElement === inputRef.value) return
-  if (checked.value) {
-    toggleDetails()
-  }
-}
-
-
-function nextCard() {
+  // Reset state
   showFeedback.value = false
   answer.value = ''
   checked.value = false
   isCorrect.value = false
-  showDetails.value = false // ← reset details toggle
+  showDetails.value = false
 
   if (currentIndex.value < reviewWords.value.length - 1) {
     currentIndex.value++
   } else {
-    alert('Økten er ferdig!')
     currentIndex.value = 0
+    completeLesson()
   }
 
   nextTick(() => inputRef.value?.focus())
+}
+
+
+function completeLesson(){
+  alert('Økten er ferdig!')
 }
 
 
@@ -105,10 +126,22 @@ onMounted(() => {
 <template>
   <div
       class="review-session"
-      @keyup.enter.prevent="(!isInputEmpty && !checked) ? checkAnswer() : (checked ? nextCard() : null)"
-      @keydown.space.prevent="maybeToggleDetails"
+      @keyup.enter.prevent="(!isInputEmpty && !checked) ? (checkAnswer(), checked = true) : (checked ? nextCard() : null)"
+      @keydown.space="maybeToggleDetails"
       tabindex="0"
   >
+
+    <transition name="level-pop">
+      <div
+          v-if="showLevelAnimation"
+          :class="['level-animation', levelMessage.includes('UP') ? 'level-up' : 'level-down']"
+      >
+        {{ levelMessage }}
+      </div>
+    </transition>
+
+
+
     <div v-if="reviewWords.length && currentWord" class="card">
       <div class="word-display">
         <p class="big-word">{{ capitalizeFirst(currentWord.prompt) }}</p>
@@ -125,36 +158,37 @@ onMounted(() => {
             :disabled="checked"
             placeholder="Ditt svar"
         />
-        <button @click="checked ? nextCard() : checkAnswer()" :disabled="isInputEmpty && !checked" class="check-button">
+        <button @click="checked ? nextCard() : (checkAnswer(), checked = true)" :disabled="isInputEmpty && !checked" class="check-button">
           {{ checked ? 'Neste' : 'Sjekk' }}
         </button>
       </div>
 
       <div class="feedback-wrapper">
-          <div
-              v-if="showFeedback"
-              class="feedback visible"
-          >
-            <p>{{ feedbackMessage }}</p>
-          </div>
+        <div v-if="showFeedback" class="feedback visible">
+          <p>{{ feedbackMessage }}</p>
+        </div>
         <div v-else class="feedback hidden">
           <p>&nbsp;</p>
         </div>
       </div>
     </div>
 
-    <button
-        class="details-toggle"
-        :class="{ disabled: !checked }"
-        @click="toggleDetails"
-    >
+    <button class="details-toggle" :class="{ disabled: !checked }" @click="toggleDetails">
       <img :src="arrowDown" alt="Vis mer" />
     </button>
 
-    <div v-if="showDetails" class="word-details">
+    <div v-if="showDetails && currentWord" class="word-details">
       <div class="word-meta">
         <h4>Ordinfo:</h4>
-        <p><strong>Norsk:</strong> {{ currentWord.word.gender }} {{ currentWord.word.norwegian }}</p>
+        <p><strong>Norsk: </strong>
+          <template v-if="currentWord.word.type === 'noun'">
+            {{ currentWord.word.gender }} {{ currentWord.word.norwegian }}
+          </template>
+          <template v-else>
+            {{ currentWord.word.norwegian }}
+          </template>
+        </p>
+
         <p><strong>Engelsk: </strong>
           <template v-if="currentWord.word.type === 'noun'">
             {{ currentWord.word.article }} {{ currentWord.word.english }}
@@ -163,12 +197,10 @@ onMounted(() => {
             {{ currentWord.word.english }}
           </template>
         </p>
-
       </div>
 
-
       <div v-if="currentWord.word.example?.length">
-        <h4>Eksempel setninger:</h4>
+        <h4>Eksempelsetninger:</h4>
         <ul>
           <li v-for="(ex, idx) in currentWord.word.example" :key="idx">{{ ex }}</li>
         </ul>
@@ -188,9 +220,6 @@ onMounted(() => {
         <p>Superlativ: {{ currentWord.word.comparison.superlative }}</p>
       </div>
     </div>
-
-
-
   </div>
 </template>
 
@@ -250,7 +279,6 @@ button.check-button:hover {
   background-color: var(--color-accent-hover);
 }
 
-
 .feedback {
   text-align: center;
   margin-top: 1rem;
@@ -274,7 +302,7 @@ button.check-button:hover {
 }
 
 .feedback-wrapper {
-  min-height: 2rem; /* juster etter ønsket høyde */
+  min-height: 2rem;
   margin-top: 1rem;
 }
 
@@ -310,7 +338,6 @@ button.check-button:hover {
   filter: brightness(1.2);
 }
 
-
 .word-details {
   margin-top: 1.5rem;
   font-size: 1.05rem;
@@ -318,6 +345,53 @@ button.check-button:hover {
   padding: 1rem;
   border-radius: 8px;
 }
+
+.level-animation {
+  position: fixed;
+  top: 2rem;
+  left: 50%;
+  transform: translateX(-50%);
+  padding: 1rem 2rem;
+  border-radius: 12px;
+  font-size: 1.5rem;
+  font-weight: bold;
+  box-shadow: 0 0 15px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  opacity: 0.95;
+}
+
+.level-up {
+  background-color: #d4edda;
+  color: #155724;
+}
+
+.level-down {
+  background-color: #f8d7da;
+  color: #721c24;
+}
+
+/* Animation */
+.level-pop-enter-active,
+.level-pop-leave-active {
+  transition: all 0.5s ease;
+}
+.level-pop-enter-from {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.8);
+}
+.level-pop-enter-to {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+.level-pop-leave-from {
+  opacity: 1;
+  transform: translateX(-50%) scale(1);
+}
+.level-pop-leave-to {
+  opacity: 0;
+  transform: translateX(-50%) scale(0.8);
+}
+
 
 
 </style>
