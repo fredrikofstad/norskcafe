@@ -3,11 +3,11 @@ import { ref, computed, onMounted, watch, nextTick } from 'vue'
 import useReviewQueue from '../composables/useReviewQueue'
 import { useSrsUpload } from '../composables/useSrsUpload'
 import { useAnswerCheck } from '../composables/useAnswerCheck'
-import {ReviewItem, Word} from '../types/words'
+import {Word} from '../types/words'
 import {getDueEntries, updateSrsProgress} from '../firebase/firebaseSrs'
 import grammarLesson from '../assets/lessons/lesson0.json'
 import arrowDown from '../assets/arrow-down.svg'
-import {SrsSessionEntry} from "../types/srs";
+
 
 // Utility functions (inlined)
 function capitalizeFirst(str: string): string {
@@ -28,7 +28,6 @@ const levelMessage = ref('')
 const showLevelAnimation = ref(false)
 
 const reviewWords = useReviewQueue(grammarLesson as Word[], dueEntries)
-const reviewedWords = ref<ReviewItem[]>([])
 
 // word levels
 const levelChange = ref<null | { wordId: string; delta: number }>(null)
@@ -45,6 +44,12 @@ const checked = ref(false)
 const isInputEmpty = computed(() => answer.value.trim() === '')
 const currentWord = computed(() => reviewWords.value?.[currentIndex.value] ?? null)
 const showDetails = ref(false)
+
+import { useReviewStats } from '../composables/useReviewStats'
+const { reviewedWords, reviewedCount, correctCount, totalCount, setTotalCount, resetStats } = useReviewStats()
+resetStats()
+setTotalCount(reviewWords.value.length)
+
 
 const {
   check: checkAnswer,
@@ -89,9 +94,15 @@ function nextCard() {
     setTimeout(() => {
       showLevelAnimation.value = false
     }, 1500)
+
+    // Add to completed set if both directions are done
+    const session = sessionState.value[wordId]
+    if (session && !session.pending.toEnglish && !session.pending.toNorwegian) {
+      reviewedCount.value += 1
+    }
   })
 
-  // Reset state
+  // Tilbakestill input og tilstand
   showFeedback.value = false
   answer.value = ''
   checked.value = false
@@ -107,6 +118,7 @@ function nextCard() {
 
   nextTick(() => inputRef.value?.focus())
 }
+
 
 
 function completeLesson(){

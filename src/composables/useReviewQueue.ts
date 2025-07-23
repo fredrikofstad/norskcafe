@@ -1,5 +1,5 @@
 import { Ref, ref } from 'vue'
-import { Word, ReviewItem, NounWord } from '../types/word'
+import { Word, ReviewItem, NounWord } from '../types/words'
 import { SrsEntry } from '../types/srs'
 
 // Type guard for nouns
@@ -30,7 +30,6 @@ export default function useReviewQueue(
         const directions = ['toEnglish', 'toNorwegian'] as const
 
         for (const direction of directions) {
-            if (!entry.pending[direction]) continue
 
             let prompt = ''
             let answer = ''

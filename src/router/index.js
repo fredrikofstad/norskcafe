@@ -9,12 +9,12 @@ import Review from "../views/Review.vue";
 
 
 const routes = [
-    { path: '/', component: Home },
-    { path: '/login', component: Login },
-    { path: '/dashboard', component: Dashboard },
-    { path: '/privacy', component: Privacy },
-    { path: '/account', component: Account },
-    { path: '/review', component: Review },
+    { path: '/', name: 'home', component: Home },
+    { path: '/login', name: 'login', component: Login },
+    { path: '/dashboard', name: 'dashboard', component: Dashboard },
+    { path: '/privacy', name: 'privacy', component: Privacy },
+    { path: '/account', name: 'account', component: Account },
+    { path: '/review', name: 'review', component: Review }
 ]
 
 const router = createRouter({
