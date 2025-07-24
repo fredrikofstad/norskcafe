@@ -1,148 +1,90 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, nextTick } from 'vue'
-import useReviewQueue from '../composables/useReviewQueue'
-import { useSrsUpload } from '../composables/useSrsUpload'
+import { ref, watch, nextTick } from 'vue'
+import { useSrsReview } from '../composables/useSrsReview'
 import { useAnswerCheck } from '../composables/useAnswerCheck'
-import {Word} from '../types/words'
-import {getDueEntries, updateSrsProgress} from '../firebase/firebaseSrs'
 import grammarLesson from '../assets/lessons/lesson0.json'
-import arrowDown from '../assets/arrow-down.svg'
-
-
-// Utility functions (inlined)
-function capitalizeFirst(str: string): string {
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
-
-// Setup data
-
-const today = new Date()
-const dueEntries = getDueEntries(today)
-
-const sessionState = ref(
-    Object.fromEntries(
-        dueEntries.map(entry => [entry.wordId, entry])
-    )
-)
-const levelMessage = ref('')
-const showLevelAnimation = ref(false)
-
-const reviewWords = useReviewQueue(grammarLesson as Word[], dueEntries)
-
-// word levels
-const levelChange = ref<null | { wordId: string; delta: number }>(null)
-const showLevelFeedback = ref(false)
-
-
-useSrsUpload(() => reviewedWords.value)
-
-const currentIndex = ref(0)
-const answer = ref('')
-const inputRef = ref<HTMLInputElement | null>(null)
-const checked = ref(false)
-
-const isInputEmpty = computed(() => answer.value.trim() === '')
-const currentWord = computed(() => reviewWords.value?.[currentIndex.value] ?? null)
-const showDetails = ref(false)
-
-import { useReviewStats } from '../composables/useReviewStats'
-const { reviewedWords, reviewedCount, correctCount, totalCount, setTotalCount, resetStats } = useReviewStats()
-resetStats()
-setTotalCount(reviewWords.value.length)
+import ReviewCard from '../components/ReviewCard.vue'
+import { Word } from '../types/words'
 
 
 const {
-  check: checkAnswer,
+  reviewWords, // The actual queue of items to review
+  currentIndex,
+  currentWord,
+  levelMessage,
+  showLevelAnimation,
+  processSrsUpdate,
+  moveToNextSrsCard,
+  reviewedWords, // The global Ref from useReviewStats, used by useAnswerCheck and useSrsUpload
+  reviewedCount, // Stat: number of words completed both directions
+  correctCount,  // Stat: number of correct answers
+  totalCount,    // Stat: initial total items in session
+} = useSrsReview(grammarLesson as Word[])
+
+
+const answer = ref('')
+const checked = ref(false) // State indicating if the current card's answer has been checked
+
+// for debugging, consider making  a global var for other files
+const showDebugStats = ref(false)
+
+const {
+  check: checkAnswerLogic,
   isCorrect,
   feedbackMessage,
   showFeedback
 } = useAnswerCheck(
-    reviewWords,
-    currentWord,
-    answer,
-    reviewedWords,
-    () => {
-      nextTick(() => (document.querySelector('.review-session') as HTMLElement)?.focus())
+    currentWord,    // The current word to check
+    answer,         // The user's answer input
+    reviewedWords,  // The shared Ref to record all reviewed items (for stats/upload)
+    () => {         // Callback after an answer is checked
+      nextTick(() => {
+        // After checking the input for the next card is focused.
+        const reviewCardComponent = document.querySelector('.card') as HTMLElement
+        if (reviewCardComponent) {
+          const inputElement = reviewCardComponent.querySelector('input') as HTMLInputElement;
+          inputElement?.focus();
+        }
+      })
     }
 )
 
-function toggleDetails() {
-  if (checked.value) {
-    showDetails.value = !showDetails.value
-  }
+
+function handleCheckAnswer() {
+  if (!currentWord.value) return
+  checkAnswerLogic()
+  checked.value = true
 }
 
-function maybeToggleDetails(e: KeyboardEvent) {
-  const target = e.target as HTMLElement
-  if (target.tagName === 'INPUT' || target.tagName === 'TEXTAREA') return
-  e.preventDefault()
-  if (checked.value) toggleDetails()
-}
+function handleNextCard() {
+  if (!currentWord.value) return
 
-function nextCard() {
-  const word = currentWord.value
-  if (!word) return
+  processSrsUpdate(
+      currentWord.value.word.id,
+      currentWord.value.direction,
+      currentWord.value.correct! // Asserting it's not null/undefined here after check
+  )
 
-  const wordId = word.word.id
-  const direction = word.direction
-  const correct = !!word.correct
-
-  updateSrsProgress(wordId, direction, correct, sessionState.value, (id, leveledUp) => {
-    levelMessage.value = leveledUp ? 'Level UP!' : 'Level Down'
-    showLevelAnimation.value = true
-
-    setTimeout(() => {
-      showLevelAnimation.value = false
-    }, 1500)
-
-    // Add to completed set if both directions are done
-    const session = sessionState.value[wordId]
-    if (session && !session.pending.toEnglish && !session.pending.toNorwegian) {
-      reviewedCount.value += 1
-    }
-  })
-
-  // Tilbakestill input og tilstand
-  showFeedback.value = false
   answer.value = ''
   checked.value = false
   isCorrect.value = false
-  showDetails.value = false
+  showFeedback.value = false
 
-  if (currentIndex.value < reviewWords.value.length - 1) {
-    currentIndex.value++
-  } else {
-    currentIndex.value = 0
-    completeLesson()
-  }
-
-  nextTick(() => inputRef.value?.focus())
+  moveToNextSrsCard()
 }
 
 
+watch(currentWord, () => {
+  answer.value = ''
+  checked.value = false
+  isCorrect.value = false
+  showFeedback.value = false
+}, { immediate: true })
 
-function completeLesson(){
-  alert('Økten er ferdig!')
-}
-
-
-watch(currentIndex, () => {
-  nextTick(() => inputRef.value?.focus())
-})
-
-onMounted(() => {
-  inputRef.value?.focus()
-})
 </script>
 
 <template>
-  <div
-      class="review-session"
-      @keyup.enter.prevent="(!isInputEmpty && !checked) ? (checkAnswer(), checked = true) : (checked ? nextCard() : null)"
-      @keydown.space="maybeToggleDetails"
-      tabindex="0"
-  >
-
+  <div class="review-session">
     <transition name="level-pop">
       <div
           v-if="showLevelAnimation"
@@ -152,210 +94,37 @@ onMounted(() => {
       </div>
     </transition>
 
+    <ReviewCard
+        v-if="currentWord"
+        :word="currentWord"
+        :checked="checked"
+        :is-correct="isCorrect"
+        :feedback-message="feedbackMessage"
+        :show-feedback="showFeedback"
+        @update:answer="val => answer = val"
+        @check-answer="handleCheckAnswer"
+        @next-card="handleNextCard"
+        @toggle-details="() => {}"
+    />
+    <p v-else>Du har ingen ord å repetere!</p>
 
 
-    <div v-if="reviewWords.length && currentWord" class="card">
-      <div class="word-display">
-        <p class="big-word">{{ capitalizeFirst(currentWord.prompt) }}</p>
-        <p class="direction-hint">
-          {{ currentWord.direction === 'toEnglish' ? 'Oversett til engelsk' : 'Oversett til norsk' }}
-        </p>
-      </div>
-
-      <div class="input-group">
-        <input
-            ref="inputRef"
-            v-model="answer"
-            :class="{ correct: checked && isCorrect, incorrect: checked && !isCorrect }"
-            :disabled="checked"
-            placeholder="Ditt svar"
-        />
-        <button @click="checked ? nextCard() : (checkAnswer(), checked = true)" :disabled="isInputEmpty && !checked" class="check-button">
-          {{ checked ? 'Neste' : 'Sjekk' }}
-        </button>
-      </div>
-
-      <div class="feedback-wrapper">
-        <div v-if="showFeedback" class="feedback visible">
-          <p>{{ feedbackMessage }}</p>
-        </div>
-        <div v-else class="feedback hidden">
-          <p>&nbsp;</p>
-        </div>
-      </div>
-    </div>
-
-    <button class="details-toggle" :class="{ disabled: !checked }" @click="toggleDetails">
-      <img :src="arrowDown" alt="Vis mer" />
-    </button>
-
-    <div v-if="showDetails && currentWord" class="word-details">
-      <div class="word-meta">
-        <h4>Ordinfo:</h4>
-        <p><strong>Norsk: </strong>
-          <template v-if="currentWord.word.type === 'noun'">
-            {{ currentWord.word.gender }} {{ currentWord.word.norwegian }}
-          </template>
-          <template v-else>
-            {{ currentWord.word.norwegian }}
-          </template>
-        </p>
-
-        <p><strong>Engelsk: </strong>
-          <template v-if="currentWord.word.type === 'noun'">
-            {{ currentWord.word.article }} {{ currentWord.word.english }}
-          </template>
-          <template v-else>
-            {{ currentWord.word.english }}
-          </template>
-        </p>
-      </div>
-
-      <div v-if="currentWord.word.example?.length">
-        <h4>Eksempelsetninger:</h4>
-        <ul>
-          <li v-for="(ex, idx) in currentWord.word.example" :key="idx">{{ ex }}</li>
-        </ul>
-      </div>
-
-      <div v-if="currentWord.word.type === 'verb' && currentWord.word.conjugation">
-        <h4>Bøying:</h4>
-        <p>Nåtid: {{ currentWord.word.conjugation.present }}</p>
-        <p>Fortid: {{ currentWord.word.conjugation.past }}</p>
-        <p>Perfektum: {{ currentWord.word.conjugation.perfect }}</p>
-      </div>
-
-      <div v-if="currentWord.word.type === 'adjective' && currentWord.word.comparison">
-        <h4>Gradbøying:</h4>
-        <p>Positiv: {{ currentWord.word.comparison.positive }}</p>
-        <p>Komparativ: {{ currentWord.word.comparison.comparative }}</p>
-        <p>Superlativ: {{ currentWord.word.comparison.superlative }}</p>
-      </div>
+    <!-- Conditional rendering for debug stats -->
+    <div v-if="showDebugStats" class="review-stats">
+      <p>Reviewed words (both directions done): {{ reviewedCount }}</p>
+      <p>Correct answers in session: {{ correctCount }}</p>
+      <p>Total initial items in session: {{ totalCount }}</p>
+      <p>Current queue size: {{ reviewWords.length }}</p>
     </div>
   </div>
 </template>
 
-
 <style scoped>
+
 .review-session {
   max-width: 900px;
   margin: 3rem auto;
-  padding: 2rem;
-  background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
-}
-.review-session:focus {
-  outline: none;
-  border: none;
-}
-
-.input-group {
-  display: flex;
-  flex-direction: row;
-  align-items: stretch;
-  margin-top: 1.5rem;
-}
-
-input {
-  flex: 1;
-  padding: 1rem;
-  font-size: 1.2rem;
-  border: 1px solid #ccc;
-  border-radius: 6px 0 0 6px;
-  transition: background-color 0.4s ease, border-color 0.4s ease;
-}
-
-input.correct {
-  background-color: #d4edda;
-  border-color: #28a745;
-}
-
-input.incorrect {
-  background-color: #f8d7da;
-  border-color: #dc3545;
-}
-
-button.check-button {
-  padding: 1rem;
-  font-size: 1.2rem;
-  background-color: var(--color-accent);
-  color: white;
-  border: none;
-  border-radius: 0 6px 6px 0;
-  cursor: pointer;
-  transition: background-color 0.3s ease;
-}
-
-button.check-button:hover {
-  background-color: var(--color-accent-hover);
-}
-
-.feedback {
-  text-align: center;
-  margin-top: 1rem;
-  font-size: 1.1rem;
-}
-
-.word-display {
-  text-align: center;
-  margin-bottom: 1rem;
-}
-
-.big-word {
-  font-size: 3rem;
-  font-weight: bold;
-}
-
-.direction-hint {
-  font-size: 1rem;
-  color: #777;
-  margin-top: 0.25rem;
-}
-
-.feedback-wrapper {
-  min-height: 2rem;
-  margin-top: 1rem;
-}
-
-.feedback.hidden {
-  visibility: hidden;
-}
-
-.feedback.visible {
-  visibility: visible;
-}
-
-.details-toggle {
-  display: block;
-  margin: 2rem auto 0;
-  background: none;
-  border: none;
-  cursor: pointer;
-  opacity: 1;
-  transition: opacity 0.3s ease;
-}
-
-.details-toggle.disabled {
-  opacity: 0.3;
-  pointer-events: none;
-}
-
-.details-toggle img {
-  width: 32px;
-  height: 32px;
-}
-
-.details-toggle:hover img {
-  filter: brightness(1.2);
-}
-
-.word-details {
-  margin-top: 1.5rem;
-  font-size: 1.05rem;
-  background: #f9f9f9;
-  padding: 1rem;
-  border-radius: 8px;
+  position: relative;
 }
 
 .level-animation {
@@ -404,6 +173,10 @@ button.check-button:hover {
   transform: translateX(-50%) scale(0.8);
 }
 
-
-
+.review-stats {
+  text-align: center;
+  margin-top: 1rem;
+  font-size: 1rem;
+  color: #555;
+}
 </style>

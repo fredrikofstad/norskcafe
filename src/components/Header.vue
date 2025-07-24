@@ -48,12 +48,12 @@ function goHome() {
         <span class="header-title-text">Cafe</span>
       </button>
     </div>
-
+    <!-- For review session -->
     <div v-if="isReviewPage" class="review-stats">
       <span>{{ reviewedCount }} / {{ totalCount / 2 }} ord</span>
       <span class="accuracy">{{ accuracy }}% riktige</span>
     </div>
-
+    <!-- For most pages -->
     <div v-else>
       <div class="header-user">
         <button v-if="!user" class="login-button" @click="goToLogin">
@@ -125,6 +125,5 @@ function goHome() {
 .accuracy {
   font-weight: 600;
 }
-
 
 </style>
