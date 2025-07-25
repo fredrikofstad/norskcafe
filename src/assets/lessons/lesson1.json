@@ -1,0 +1,18 @@
+[
+  {
+    "id": "1n1",
+    "type": "noun",
+    "norwegian": "stol",
+    "english": "chair",
+    "gender": "en",
+    "article": "a",
+    "plural": {
+      "indefinite": "stoler",
+      "definite": "stolene"
+    },
+    "level": "A1",
+    "example": [
+      "Jeg sitter på en stol."
+    ]
+  }
+]

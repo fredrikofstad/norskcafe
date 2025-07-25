@@ -23,6 +23,10 @@ function goToReview(){
   router.push('/review')
 }
 
+function goToLearn(){
+  router.push('/lessons')
+}
+
 function logout() {
   auth.signOut()
   router.push('/login')

@@ -2,11 +2,7 @@
 import { ref, computed, watch, nextTick } from 'vue'
 import { ReviewItem } from '../types/words'
 import arrowDown from '../assets/arrow-down.svg'
-
-function capitalizeFirst(str: string): string {
-  if (!str) return ''
-  return str.charAt(0).toUpperCase() + str.slice(1)
-}
+import { capitalizeFirst } from '../utils/helpers'
 
 const props = defineProps<{
   word: ReviewItem | null;
@@ -192,7 +188,6 @@ watch(() => props.checked, (newVal) => {
 </template>
 
 <style scoped>
-/* No style changes needed */
 .card {
   max-width: 900px;
   margin: 3rem auto;
@@ -201,14 +196,22 @@ watch(() => props.checked, (newVal) => {
   border-radius: 8px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
   outline: none;
+  box-sizing: border-box; /* Crucial: Include padding in the element's total width and height */
+  width: calc(100% - 2rem); /* Ensure it doesn't exceed viewport minus margin on very small screens */
+  max-width: 900px; /* Keep the max-width for larger screens */
 }
-
+.card:focus-visible {
+  outline: 1px dotted #555;
+  outline-offset: 2px;
+}
 
 .input-group {
   display: flex;
   flex-direction: row;
   align-items: stretch;
   margin-top: 1.5rem;
+  width: 100%; /* Ensure it takes full width of its parent */
+  box-sizing: border-box; /* Important for flex children */
 }
 
 input {
@@ -218,6 +221,8 @@ input {
   border: 1px solid #ccc;
   border-radius: 6px 0 0 6px;
   transition: background-color 0.4s ease, border-color 0.4s ease;
+  min-width: 0; /* Allow the input to shrink below its content size */
+  box-sizing: border-box; /* Include padding in input's width */
 }
 
 input:focus {
@@ -246,6 +251,12 @@ button.check-button {
   cursor: pointer;
   transition: background-color 0.3s ease;
   white-space: nowrap;
+  box-sizing: border-box; /* Include padding in button's width */
+  /* NEW: Adjust padding/font-size for smaller screens */
+  @media (max-width: 480px) { /* Adjust breakpoint as needed */
+    padding: 0.8rem 1rem; /* Slightly smaller padding */
+    font-size: 1rem; /* Slightly smaller font */
+  }
 }
 
 button.check-button:hover:not(:disabled) {
@@ -287,6 +298,7 @@ button.check-button:disabled {
   font-size: 3rem;
   font-weight: bold;
   color: #333;
+  word-break: break-word; /* Allow long words to break */
 }
 
 .direction-hint {
@@ -333,6 +345,7 @@ button.check-button:disabled {
   border-radius: 8px;
   line-height: 1.6;
   color: #444;
+  word-break: break-word; /* Ensure details content also wraps */
 }
 
 .word-details h4 {

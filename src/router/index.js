@@ -6,6 +6,8 @@ import Dashboard from "../views/Dashboard.vue";
 import Privacy from "../views/Privacy.vue";
 import Account from "../views/Account.vue";
 import Review from "../views/Review.vue";
+import Lessons from "../views/Lessons.vue";
+import Lesson from "../components/Lesson.vue"
 
 
 const routes = [
@@ -14,7 +16,15 @@ const routes = [
     { path: '/dashboard', name: 'dashboard', component: Dashboard },
     { path: '/privacy', name: 'privacy', component: Privacy },
     { path: '/account', name: 'account', component: Account },
-    { path: '/review', name: 'review', component: Review }
+    { path: '/review', name: 'review', component: Review },
+    { path: '/lessons', name: 'lessons', component: Lessons },
+    {
+        path: '/lesson/:lessonId', // Route with a dynamic parameter
+        name: 'LessonDetail',      // Name for programmatic navigation
+        component: Lesson,
+        props: true
+    },
+
 ]
 
 const router = createRouter({

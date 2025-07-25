@@ -1,9 +1,9 @@
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue'
+import { ref, watch, nextTick, onMounted } from 'vue'
 import { useSrsReview } from '../composables/useSrsReview'
 import { useAnswerCheck } from '../composables/useAnswerCheck'
-import grammarLesson from '../assets/lessons/lesson0.json'
 import ReviewCard from '../components/ReviewCard.vue'
+import ReviewSummary from '../components/ReviewSummary.vue'
 import { Word } from '../types/words'
 
 
@@ -19,7 +19,9 @@ const {
   reviewedCount, // Stat: number of words completed both directions
   correctCount,  // Stat: number of correct answers
   totalCount,    // Stat: initial total items in session
-} = useSrsReview(grammarLesson as Word[])
+  sessionState,
+  isLoadingLessons
+} = useSrsReview()
 
 
 const answer = ref('')
@@ -27,6 +29,13 @@ const checked = ref(false) // State indicating if the current card's answer has 
 
 // for debugging, consider making  a global var for other files
 const showDebugStats = ref(false)
+
+// storing last review session:
+const lastSessionReviewedItems = ref<ReviewItem[]>([]);
+const lastSessionFinalSrsState = ref<Record<string, SrsSessionEntry>>({});
+const lastSessionInitialTotalItems = ref(0);
+
+const sessionCompleted = ref(false)
 
 const {
   check: checkAnswerLogic,
@@ -70,7 +79,15 @@ function handleNextCard() {
   isCorrect.value = false
   showFeedback.value = false
 
-  moveToNextSrsCard()
+  const isSessionEnd = moveToNextSrsCard() // Assume moveToNextSrsCard will be updated to return this
+  if (isSessionEnd) {
+    // Session just completed, store its data before showing summary
+    lastSessionReviewedItems.value = [...reviewedWords.value]; // Deep copy
+    lastSessionFinalSrsState.value = { ...sessionState.value }; // Shallow copy
+    lastSessionInitialTotalItems.value = totalCount.value;
+
+    sessionCompleted.value = true;
+  }
 }
 
 
@@ -80,6 +97,31 @@ watch(currentWord, () => {
   isCorrect.value = false
   showFeedback.value = false
 }, { immediate: true })
+
+
+watch(isLoadingLessons, (newLoadingState) => {
+  if (!newLoadingState) {
+    // Determine view based on whether words are available
+    if (reviewWords.value.length === 0) {
+      lastSessionReviewedItems.value = [];
+      lastSessionFinalSrsState.value = {};
+      lastSessionInitialTotalItems.value = 0;
+      sessionCompleted.value = true; // Show summary if no words
+      console.log("Initial load complete: No words due. Displaying empty summary.");
+    } else {
+      sessionCompleted.value = false; // Show review card if words are due
+      console.log("Initial load complete: Words due. Starting review session.");
+      nextTick(() => {
+        const reviewCardComponent = document.querySelector('.card') as HTMLElement
+        if (reviewCardComponent) {
+          const inputElement = reviewCardComponent.querySelector('input') as HTMLInputElement;
+          inputElement?.focus();
+        }
+      });
+    }
+  }
+}, { immediate: true }); // Run immediately to catch initial loading state
+
 
 </script>
 
@@ -94,6 +136,13 @@ watch(currentWord, () => {
       </div>
     </transition>
 
+    <template v-if="isLoadingLessons">
+      <p class="loading-message">Loading words...</p>
+    </template>
+
+    <!-- Conditional rendering based on session completion -->
+    <template v-if="!sessionCompleted">
+
     <ReviewCard
         v-if="currentWord"
         :word="currentWord"
@@ -106,7 +155,6 @@ watch(currentWord, () => {
         @next-card="handleNextCard"
         @toggle-details="() => {}"
     />
-    <p v-else>Du har ingen ord å repetere!</p>
 
 
     <!-- Conditional rendering for debug stats -->
@@ -116,8 +164,24 @@ watch(currentWord, () => {
       <p>Total initial items in session: {{ totalCount }}</p>
       <p>Current queue size: {{ reviewWords.length }}</p>
     </div>
+
+    </template>
+
+    <!-- Summary page when session is completed -->
+    <ReviewSummary
+        v-else
+        :reviewed-items="reviewedWords"
+        :final-srs-state="sessionState"
+        :initial-total-items="totalCount"
+    />
+
+
   </div>
+
+
 </template>
+
+
 
 <style scoped>
 
@@ -178,5 +242,12 @@ watch(currentWord, () => {
   margin-top: 1rem;
   font-size: 1rem;
   color: #555;
+}
+
+.loading-message {
+  font-size: 1.8rem;
+  color: var(--color-accent);
+  text-align: center;
+  margin-top: 5rem;
 }
 </style>

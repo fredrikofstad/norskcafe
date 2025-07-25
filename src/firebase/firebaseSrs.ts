@@ -11,38 +11,14 @@ let srsDatabase: Record<string, SrsEntry> = {
         easeFactor: 2.5,
         repetitions: 2,
     },
-    '0n2': {
-        wordId: '0n2',
+    '1n1': {
+        wordId: '1n1',
         lastReviewed: '2025-07-10',
-        nextReview: '2025-07-25',
-        interval: 5,
-        easeFactor: 2.3,
+        nextReview: '2025-07-19',
+        interval: 3,
+        easeFactor: 2.5,
         repetitions: 3,
     },
-    '0n3': {
-        wordId: '0n3',
-        lastReviewed: '2025-07-10',
-        nextReview: '2025-07-19',
-        interval: 3,
-        easeFactor: 2.5,
-        repetitions: 2,
-    },
-    '0a1': {
-        wordId: '0a1',
-        lastReviewed: '2025-07-10',
-        nextReview: '2025-07-19',
-        interval: 3,
-        easeFactor: 2.5,
-        repetitions: 2,
-    },
-    '0v1': {
-        wordId: '0v1',
-        lastReviewed: '2025-07-01',
-        nextReview: '2025-07-05',
-        interval: 1,
-        easeFactor: 2.0,
-        repetitions: 0,
-    }
 }
 
 export function getDueEntries(today: Date): SrsSessionEntry[] {
