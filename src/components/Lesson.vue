@@ -7,6 +7,7 @@ import useReviewQueue from '../composables/useReviewQueue'
 import { Word, ReviewItem } from '../types/words'
 import { loadAllLessons } from '../utils/lessonLoader'
 import { useRoute, useRouter } from 'vue-router';
+import { useReviewStats } from '../composables/useReviewStats'
 
 const route = useRoute();
 const router = useRouter();
@@ -17,6 +18,7 @@ const props = defineProps<{
 
 const numericLessonId = computed(() => parseInt(props.lessonId));
 
+const { reviewedWords, reviewedCount, setTotalCount, resetStats } = useReviewStats();
 
 const lessonWords = ref<ReviewItem[]>([]);
 const currentIndex = ref(0);
@@ -52,14 +54,10 @@ async function loadLessonWords() {
   isLoading.value = true;
   lessonWords.value = [];
   currentIndex.value = 0;
-
-  console.log(`[Lesson.vue] --- Starting load for lessonId: ${numericLessonId.value} ---`);
+  resetStats();
 
   try {
     const allWords = await loadAllLessons(); // Load all words from all JSONs
-    console.log(`[Lesson.vue] Total words loaded from ALL lessons: ${allWords.length}`);
-    // console.log("[Lesson.vue] All loaded words (for inspection):", allWords); // Uncomment for deep inspection
-
     const filteredWords = allWords.filter(word => {
       // Ensure word.id exists and is a string
       if (!word.id || typeof word.id !== 'string' || word.id.length === 0) {
@@ -69,24 +67,17 @@ async function loadLessonWords() {
       const firstCharOfId = word.id.charAt(0);
       const parsedDigit = parseInt(firstCharOfId);
 
-      // Log each word's ID and the comparison result
-      console.log(`[Lesson.vue] Checking word ID: ${word.id} | First Char: '${firstCharOfId}' | Parsed Digit: ${parsedDigit} | Target LessonId: ${numericLessonId.value} | Match: ${parsedDigit === numericLessonId.value}`);
-
       return parsedDigit === numericLessonId.value;
     });
-
-    console.log(`[Lesson.vue] Words filtered for lesson ${numericLessonId.value}: ${filteredWords.length}`);
-
-    lessonWords.value = useReviewQueue(filteredWords, []).value;
-
-    console.log(`[Lesson.vue] Final review items for lesson ${numericLessonId.value} (after useReviewQueue): ${lessonWords.value.length}`);
+    const initialReviewItems = useReviewQueue(filteredWords, []).value;
+    lessonWords.value = initialReviewItems;
+    setTotalCount(initialReviewItems.length);
 
   } catch (error) {
     console.error(`[Lesson.vue] Error loading words for lesson ${numericLessonId.value}:`, error);
     lessonWords.value = [];
   } finally {
     isLoading.value = false;
-    console.log(`[Lesson.vue] --- Finished load for lessonId: ${numericLessonId.value} ---`);
   }
 }
 
@@ -97,17 +88,34 @@ function handleCheckAnswer() {
 }
 
 function handleNextCard() {
+  const lastReviewedItem = currentWord.value;
+  if (lastReviewedItem) {
+    reviewedWords.value.push(lastReviewedItem); // <--- Update the shared reviewedWords array
+  }
+
+  if (lastReviewedItem && lastReviewedItem.correct === false) {
+    lessonWords.value.push(JSON.parse(JSON.stringify(lastReviewedItem)));
+    console.log(`[Lesson.vue] Re-queued incorrect word: ${lastReviewedItem.word.norwegian} (${lastReviewedItem.direction})`);
+  }
+
+  // Reset card state for the next word
   answer.value = ''
   checked.value = false
   isCorrect.value = false
   showFeedback.value = false
 
+  // Move to the next card in the queue
   if (currentIndex.value < lessonWords.value.length - 1) {
     currentIndex.value++
   } else {
-    alert('Lesson completed!');
-    router.push({ name: 'Lessons' });
+    finishSession()
   }
+}
+
+function finishSession(){
+  resetStats();
+  alert('Lesson completed!');
+  router.push('/lessons');
 }
 
 watch(numericLessonId, (newId, oldId) => {
@@ -157,7 +165,7 @@ watch(currentWord, () => {
 </template>
 
 <style scoped>
-/* ... (styles remain unchanged) ... */
+
 .lesson-session {
   max-width: 900px;
   margin: 3rem auto;

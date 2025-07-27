@@ -13,25 +13,14 @@ interface LessonMeta {
 
 const allLessons: LessonMeta[] = [
   // A1 Lessons
-  { id: 0, title: 'Intervju', level: 'A1', description: 'Basic interview phrases.' },
-  { id: 1, title: 'Julebord', level: 'A1', description: 'Vocabulary for Christmas parties.' },
-  { id: 2, title: 'På kafe', level: 'A1', description: 'Ordering and conversations at a cafe.' },
-  { id: 3, title: 'Reiseplaner', level: 'A1', description: 'Discussing travel plans.' },
+  { id: 0, title: 'Grammatikk', level: 'A1', description: 'Hvordan beskrive språk?' },
+  { id: 1, title: 'Stol', level: 'A1', description: 'Bare stol' },
+
   // A2 Lessons
-  { id: 4, title: 'Hverdagsliv', level: 'A2', description: 'Daily routines and activities.' },
-  { id: 5, title: 'Shoppingtur', level: 'A2', description: 'Vocabulary for shopping.' },
-  { id: 6, title: 'På jobb', level: 'A2', description: 'Workplace conversations.' },
-  { id: 7, title: 'Familie og venner', level: 'A2', description: 'Talking about family and friends.' },
+
   // B1 Lessons
-  { id: 8, title: 'Nyheter og medier', level: 'B1', description: 'Discussing current events.' },
-  { id: 9, title: 'Fritidsaktiviteter', level: 'B1', description: 'Hobbies and free time.' },
-  { id: 10, title: 'Helse og velvære', level: 'B1', description: 'Health-related vocabulary.' },
-  { id: 11, title: 'Kultur og tradisjoner', level: 'B1', description: 'Norwegian culture and traditions.' },
+  { id: 1, title: 'Intervjuet', level: 'B1', description: 'Et kort jobbintervju' },
   // B2 Lessons
-  { id: 12, title: 'Samfunnsdebatt', level: 'B2', description: 'Participating in social debates.' },
-  { id: 13, title: 'Utdanning og karriere', level: 'B2', description: 'Education and career paths.' },
-  { id: 14, title: 'Miljø og klima', level: 'B2', description: 'Environmental issues.' },
-  { id: 15, title: 'Politikk og økonomi', level: 'B2', description: 'Political and economic topics.' },
 ];
 
 // Group lessons by level for easier rendering
@@ -89,12 +78,12 @@ function selectLesson(lessonId: number) {
 </template>
 
 <style scoped>
-/* ... (styles remain unchanged) ... */
+
 .lessons-page {
   max-width: 1200px;
   margin: 3rem auto;
   padding: 2rem;
-  background: white;
+  background-color: rgba(255, 255, 255, 0.8);
   border-radius: 12px;
   box-shadow: 0 6px 20px rgba(0, 0, 0, 0.1);
   font-family: 'Inter', sans-serif;

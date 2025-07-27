@@ -14,7 +14,7 @@ const route = useRoute()
 
 const user = ref(null)
 
-const isReviewPage = computed(() => route.name === 'review')
+const isReviewPage = computed(() => route.name === 'review' || route.name === 'LessonDetail')
 
 const accuracy = computed(() => {
   if (!correctCount.value || !reviewedCount.value || reviewedCount.value === 0) return 100
